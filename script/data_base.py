@@ -9,7 +9,7 @@ def create_connection():
     return cursor
 
 
-def get_authors(cursor):
+def get_title_authors(cursor):
     cursor.execute('SELECT * FROM books')
     data = []
     for book in cursor.fetchall():
@@ -23,5 +23,5 @@ def get_authors(cursor):
 
 if __name__ == "__main__":
     cursor = create_connection()
-    authors = get_authors(cursor)
+    authors = get_title_authors(cursor)
     print(authors)
