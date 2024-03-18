@@ -10,7 +10,7 @@ def create_connection():
 
 
 def get_title_authors(cursor):
-    cursor.execute('SELECT * FROM books')
+    cursor.execute('SELECT * FROM books2')
     data = []
     for book in cursor.fetchall():
         book_id, title, author, created_at = book
@@ -21,7 +21,30 @@ def get_title_authors(cursor):
 
     return data
 
+
+def get_emails_and_id(cursor):
+    cursor.execute("SELECT * FROM books2")
+    data = []
+
+    for book in cursor.fetchall():
+        book_id, email_adres, title, author, created_at = book
+        data.append({
+            "id": book_id,
+            "email": email_adres,
+        })
+
+    return data
+
+# TODO - Get title_avible
+# TODO - Get make column for avibility of book
+# TODO - Insert new data to specific row
+# TODO - Make user calss that can add his email and book
+
+
 if __name__ == "__main__":
     cursor = create_connection()
     authors = get_title_authors(cursor)
-    print(authors)
+
+    print("----"*10, "\n")
+
+    emails_browed = get_emails_and_id(cursor)
