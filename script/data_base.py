@@ -1,6 +1,25 @@
 import sqlite3
 
 
+class BaseConnectManager:
+
+    def __init__(self, data_base):
+        self.data_base = data_base
+        self.cursor = None
+        pass
+
+    def __enter__(self):
+        print("conecting")
+        with sqlite3.connect(self.data_base) as connection:
+            cursor = connection.cursor()
+        self.cursor = cursor
+        return self.cursor
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+        print("closing")
+
+
 def create_connection():
     with sqlite3.connect('base.db') as connection:
         cursor = connection.cursor()
@@ -10,7 +29,7 @@ def create_connection():
 
 
 def get_title_authors(cursor):
-    cursor.execute('SELECT * FROM books2')
+    cursor.execute('SELECT * FROM books')
     data = []
     for book in cursor.fetchall():
         book_id, title, author, created_at = book
