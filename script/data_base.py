@@ -1,17 +1,21 @@
+""" Main file data base cahndling """
 import sqlite3
 
 
 class BaseConnectManager:
+    """ Contex menager for data base"""
 
     def __init__(self, data_base):
         self.data_base = data_base
         self.cursor = None
+        self.connection = None
         pass
 
     def __enter__(self):
         print("conecting")
         with sqlite3.connect(self.data_base) as connection:
             cursor = connection.cursor()
+        self.connection = connection
         self.cursor = cursor
         return self.cursor
 
@@ -20,10 +24,25 @@ class BaseConnectManager:
         print("closing")
 
 
+def get_all_books_from_db(base_name: str) -> list:
+    with BaseConnectManager(base_name) as cursor:
+        cursor.exectue("SELECT * FROM books2")
+        data = []
+
+        for book in cursor.fetchall():
+            book_id, email_adres, title, author, created_at = book
+            data.append({
+                "id": book_id,
+                "email": email_adres,
+                "title": title,
+                "author": author,
+                "created_at": created_at
+            })
+
+
 def create_connection():
     with sqlite3.connect('base.db') as connection:
         cursor = connection.cursor()
-        # cursor.execute('SELECT * FROM books WHERE authors=?', ('Henryk Sienkiewicz',))
 
     return cursor
 
@@ -54,11 +73,12 @@ def get_emails_and_id(cursor):
 
     return data
 
-# TODO - Get title_avible
-# TODO - Get make column for avibility of book
-# TODO - Insert new data to specific row
-# TODO - Make user calss that can add his email and book
 
+def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base_name: str) -> None:
+    with BaseConnectManager(base_name) as cursor:
+        cursor.execute("INSERT INTO books2(email_adres ,title, author, created_at) VALUES(?, ?, ?, ?)",
+                       (email_adres, title, author, creted_at))
+        cursor.connection.commit()
 
 if __name__ == "__main__":
     cursor = create_connection()
@@ -67,3 +87,6 @@ if __name__ == "__main__":
     print("----"*10, "\n")
 
     emails_browed = get_emails_and_id(cursor)
+
+    """add_new_book("sienkiewicz@onet.pl", "Example1",
+                 "Ali Ahmed", "2024-02-15 10:45:22","base.db")"""
