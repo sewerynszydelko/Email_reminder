@@ -10,7 +10,8 @@ class User:
     def __str__(self) -> str:
         return f"User:{self.name}"
 
-    def get_input_chose_type(self, message: str, chosen_type=str):
+    @staticmethod
+    def get_input_choice_type(message: str, chosen_type=str):
         """Get input from user in specific type (int or str) with your message
         Args:
             message (str): Your message to user
@@ -33,6 +34,8 @@ class User:
             return False
 
 
-test = User('bob')
-result = test.get_input_chose_type("Pleas enter how many years do you have: ")
-print(type(result), result, sep="\n")
+if __name__ == "__main__":
+    test = User('bob')
+    result = test.get_input_choice_type(
+        "Pleas enter how many years do you have: ")
+    print(type(result), result, sep="\n")
