@@ -1,8 +1,10 @@
+""" Test data base file """
 from data_base import get_title_authors, create_connection, get_all_books_from_db
 import sqlite3
 
 
 def test_get_title_authors():
+    """ test get title from data base func , from test data memory"""
     # Given
     conection = sqlite3.Connection(':memory:')
     cursor = conection.cursor()
@@ -22,6 +24,7 @@ def test_get_title_authors():
 
 
 def test_get_all_books_from_db():
+    """ Test func give all books from data base """
     # Given
     connection = sqlite3.Connection(":memory:")
     cursor = connection.cursor()

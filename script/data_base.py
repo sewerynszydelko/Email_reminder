@@ -25,8 +25,14 @@ class BaseConnectManager:
 
 
 def get_all_books_from_db(base_name: str) -> list:
+    """ Get all books from data base
+    Args:
+        base_name (str): data base name
+    Returns:
+        list: returns all books info in dictonary
+    """
     with BaseConnectManager(base_name) as cursor:
-        cursor.exectue("SELECT * FROM books2")
+        cursor.execute("SELECT * FROM books2")
         data = []
 
         for book in cursor.fetchall():
@@ -38,9 +44,14 @@ def get_all_books_from_db(base_name: str) -> list:
                 "author": author,
                 "created_at": created_at
             })
+    return data
 
 
 def create_connection():
+    """ Create conection to data base
+    Returns:
+        obj : cursor to data base
+    """
     with sqlite3.connect('base.db') as connection:
         cursor = connection.cursor()
 
@@ -48,6 +59,12 @@ def create_connection():
 
 
 def get_title_authors(cursor):
+    """ Get all titles and authors of books
+    Args:
+        cursor (obj): curosr to data base
+    Returns:
+        list : Return list with title and authors in dictionary
+    """
     cursor.execute('SELECT * FROM books')
     data = []
     for book in cursor.fetchall():
@@ -61,6 +78,12 @@ def get_title_authors(cursor):
 
 
 def get_emails_and_id(cursor):
+    """ Get all emains and id
+    Args:
+        cursor (obj): curosr to data base
+    Returns:
+        list: list with id, emails in dictionary
+    """
     cursor.execute("SELECT * FROM books2")
     data = []
 
@@ -75,10 +98,19 @@ def get_emails_and_id(cursor):
 
 
 def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base_name: str) -> None:
+    """ Add new books with other info to data base
+    Args:
+        email_adres (str): email adres person
+        title (str): title of book
+        author (str): author of book
+        creted_at (str): time when added to data base
+        base_name (str): name to what data base insert
+    """
     with BaseConnectManager(base_name) as cursor:
         cursor.execute("INSERT INTO books2(email_adres ,title, author, created_at) VALUES(?, ?, ?, ?)",
                        (email_adres, title, author, creted_at))
         cursor.connection.commit()
+
 
 if __name__ == "__main__":
     cursor = create_connection()
