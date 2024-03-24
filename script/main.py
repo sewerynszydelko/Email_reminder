@@ -1,9 +1,10 @@
+""" Main file """
 from os import environ, getenv
 from dotenv import load_dotenv
 
 
 class User:
-
+    """ User class """
     def __init__(self, name: str) -> None:
         self.name = name
 

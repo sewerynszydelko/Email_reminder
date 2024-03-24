@@ -1,3 +1,4 @@
+""" Main file test """
 from main import User
 
 
