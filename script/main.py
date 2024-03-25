@@ -1,10 +1,12 @@
 """ Main file """
 from os import environ, getenv
 from dotenv import load_dotenv
+import data_base as my_db
 
 
 class User:
     """ User class """
+
     def __init__(self, name: str) -> None:
         self.name = name
 
@@ -35,8 +37,13 @@ class User:
             return False
 
 
+def show_all_boks():
+    with my_db.BaseConnectManager("base.db") as curosr:
+        data = my_db.get_title_authors(curosr)
+
+    for book in data:
+        print(book)
+
+
 if __name__ == "__main__":
-    test = User('bob')
-    result = test.get_input_choice_type(
-        "Pleas enter how many years do you have: ")
-    print(type(result), result, sep="\n")
+    show_all_boks()
