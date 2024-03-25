@@ -112,6 +112,21 @@ def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base
         cursor.connection.commit()
 
 
+def update_column_row(row_name:str, value_row, id_num:int):
+    """ Updatate column in specifuc row
+    Args:
+        row_name (str): name of row
+        value_row (_type_): new value to row int or str
+        id_num (int): id of row
+    """
+    try:
+        with BaseConnectManager("base.db") as cursor:
+            cursor.execute(f"UPDATE books2 SET {row_name}= '{value_row}' WHERE id={id_num}")
+            cursor.connection.commit()
+    except sqlite3.OperationalError as error:
+        print(f"You put in wrong place {error}")
+
+
 if __name__ == "__main__":
     cursor = create_connection()
     authors = get_title_authors(cursor)
@@ -120,5 +135,3 @@ if __name__ == "__main__":
 
     emails_browed = get_emails_and_id(cursor)
 
-    """add_new_book("sienkiewicz@onet.pl", "Example1",
-                 "Ali Ahmed", "2024-02-15 10:45:22","base.db")"""
