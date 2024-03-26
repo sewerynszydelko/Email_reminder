@@ -38,6 +38,7 @@ class User:
 
 
 def show_all_boks():
+    """ Shows all titles with thier autros from data base """
     with my_db.BaseConnectManager("base.db") as curosr:
         data = my_db.get_title_authors(curosr)
 
@@ -45,5 +46,29 @@ def show_all_boks():
         print(book)
 
 
+def mian_run():
+    print("Hello welcom in menu of book base choce what you  want below\n")
+    while True:
+        user_input = User.get_input_choice_type(
+            "What you want to do ?: \n1: See all books in base\n2:choice book\n3:Give new book to data base\n4:Exit of program\n")
+
+        match user_input:
+            case "4":
+                break
+            case "1":
+                show_all_boks()
+            case "2":
+                choice_book = User.get_input_choice_type(
+                    "Pleas write choicen book title:")
+                with my_db.BaseConnectManager("base.db") as cursor:
+                    title_author = my_db.get_title_authors(cursor)
+                    print(title_author[choice_book])
+            case "3":
+                email_adres, title, author, created_at = User.get_input_choice_type(
+                    "Pleas enter: email, title, autohr,data\n:").split(",")
+                my_db.add_new_book(email_adres, title,
+                                   author, created_at, "base.db")
+
+
 if __name__ == "__main__":
-    show_all_boks()
+    mian_run()
