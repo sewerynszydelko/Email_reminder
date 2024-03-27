@@ -65,10 +65,10 @@ def get_title_authors(cursor):
     Returns:
         list : Return list with title and authors in dictionary
     """
-    cursor.execute('SELECT * FROM books')
+    cursor.execute('SELECT * FROM books2')
     data = []
     for book in cursor.fetchall():
-        book_id, title, author, created_at = book
+        book_id, email, title, author, created_at = book
         data.append({
             'title': title,
             'author': author
@@ -112,7 +112,7 @@ def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base
         cursor.connection.commit()
 
 
-def update_column_row(row_name:str, value_row, id_num:int):
+def update_column_row(row_name: str, value_row, id_num: int):
     """ Updatate column in specifuc row
     Args:
         row_name (str): name of row
@@ -131,7 +131,4 @@ if __name__ == "__main__":
     cursor = create_connection()
     authors = get_title_authors(cursor)
 
-    print("----"*10, "\n")
-
     emails_browed = get_emails_and_id(cursor)
-
