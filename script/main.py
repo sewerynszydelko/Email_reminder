@@ -46,6 +46,14 @@ def show_all_boks():
         print(book)
 
 
+def create_message_to_remaind(data, name):
+    """ Create message that reminds about book to return """
+    final_message = f"Hello {name}\nIm writing to you to remind about book that you borowed:\n{
+        data[0]["title"]}-{data[0]["author"]}\nPleas return to libry by end of month\nBest Regards!"
+
+    return final_message
+
+
 def mian_run():
     print("Hello welcom in menu of book base choce what you  want below\n")
     while True:
@@ -68,7 +76,9 @@ def mian_run():
                     "Pleas enter: email, title, autohr,data\n:").split(",")
                 my_db.add_new_book(email_adres, title,
                                    author, created_at, "base.db")
+                show_all_boks()
 
 
 if __name__ == "__main__":
-    mian_run()
+    print(create_message_to_remaind(
+        [{"title": "ambroży", "author": "Henryk"}], "Bob"))
