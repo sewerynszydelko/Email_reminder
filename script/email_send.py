@@ -8,14 +8,22 @@ User = namedtuple("User", "name surname")
 example_user = User("Bob", "Crouch")
 
 
-def send_mail():
-    smtp_server = "smtp.gmail.com"
+def send_mail(message: str):
+    """ Sending email
+    Args:
+        message (str): mesage in email to send
+    """
+    smtp_server = "smtp.wp.pl"
     port = 465
-    sender_email = "Your email @gamil.com"
-    password = 'Your password'
+    sender_email = "@gmail"
+    password = "#"
 
     context = ssl.create_default_context()
 
     with smtplib.SMTP_SSL(smtp_server, port=port, context=context) as server:
         server.login(sender_email, password=password)
-        server.sendmail(sender_email, sender_email, "user is cool")
+        server.sendmail(sender_email, sender_email, message)
+        print("meesage sended")
+
+
+send_mail("hello 1 test")
