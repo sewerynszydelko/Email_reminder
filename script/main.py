@@ -2,6 +2,8 @@
 from os import environ, getenv
 from dotenv import load_dotenv
 import data_base as my_db
+import email_send as es
+import smtplib
 
 
 class User:
@@ -58,25 +60,39 @@ def mian_run():
     print("Hello welcom in menu of book base choce what you  want below\n")
     while True:
         user_input = User.get_input_choice_type(
-            "What you want to do ?: \n1: See all books in base\n2:choice book\n3:Give new book to data base\n4:Exit of program\n")
+            "What you want to do ?: \n1: See all books in base\n2:choice book\n3:Give new book to data base\n4:Exit of program\n5:send remaind message to people\n")
 
         match user_input:
             case "4":
                 break
             case "1":
                 show_all_boks()
+                input("type anything to continoue ")
             case "2":
+                show_all_boks()
                 choice_book = User.get_input_choice_type(
-                    "Pleas write choicen book title:")
+                    "Pleas write choicen book title by row number from 0 to 7:").split(" ")
+                
                 with my_db.BaseConnectManager("base.db") as cursor:
                     title_author = my_db.get_title_authors(cursor)
-                    print(title_author[choice_book])
+                    print(title_author[int(choice_book)][title])
+
             case "3":
                 email_adres, title, author, created_at = User.get_input_choice_type(
                     "Pleas enter: email, title, autohr,data\n:").split(",")
                 my_db.add_new_book(email_adres, title,
                                    author, created_at, "base.db")
                 show_all_boks()
+            case "5":
+                name = input("Pleas give me name to remaind: ")
+                cursor = my_db.create_connection()
+                data = my_db.get_title_authors(cursor)
+                message = create_message_to_remaind(data=data, name=name)
+
+                try:
+                    es.send_mail(message)
+                except smtplib.SMTPAuthenticationError as error:
+                    print("Error:", error)
 
 
 if __name__ == "__main__":
