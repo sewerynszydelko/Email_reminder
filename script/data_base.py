@@ -19,11 +19,12 @@ class BaseConnectManager:
             self.connection.rollback()
         else:
             self.connection.commit()
-        
+
         self.connection.close()
+        print("Closing Connection")
 
 
-def get_all_books_from_db(base_name: str) -> list:
+def get_all_books_from_db() -> list:
     """ Get all books from data base
     Args:
         base_name (str): data base name
@@ -31,11 +32,11 @@ def get_all_books_from_db(base_name: str) -> list:
         list: returns all books info in dictonary
     """
     connection = sqlite3.connect("base.db")
-    with BaseConnectManager(connection) as cursor:
-        cursor.execute("SELECT * FROM books2")
+    with BaseConnectManager(connection) as database:
+        database.cursor.execute("SELECT * FROM books2")
         data = []
 
-        for book in cursor.fetchall():
+        for book in database.cursor.fetchall():
             book_id, email_adres, title, author, created_at = book
             data.append({
                 "id": book_id,
@@ -97,7 +98,7 @@ def get_emails_and_id(cursor):
     return data
 
 
-def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base_name: str) -> None:
+def add_new_book(email_adres: str, title: str, author: str, creted_at: str) -> None:
     """ Add new books with other info to data base
     Args:
         email_adres (str): email adres person
@@ -106,10 +107,10 @@ def add_new_book(email_adres: str, title: str, author: str, creted_at: str, base
         creted_at (str): time when added to data base
         base_name (str): name to what data base insert
     """
-    with BaseConnectManager(base_name) as cursor:
-        cursor.execute("INSERT INTO books2(email_adres ,title, author, created_at) VALUES(?, ?, ?, ?)",
-                       (email_adres, title, author, creted_at))
-        cursor.connection.commit()
+    connection = sqlite3.connect("base.db")
+    with BaseConnectManager(connection) as database:
+        database.cursor.execute("INSERT INTO books2(email_adres ,title, author, created_at) VALUES(?, ?, ?, ?)",
+                                (email_adres, title, author, creted_at))
 
 
 def update_column_row(row_name: str, value_row, id_num: int):
@@ -120,10 +121,9 @@ def update_column_row(row_name: str, value_row, id_num: int):
         id_num (int): id of row
     """
     try:
-        with BaseConnectManager("base.db") as cursor:
-            cursor.execute(f"UPDATE books2 SET {row_name}= '{
-                           value_row}' WHERE id={id_num}")
-            cursor.connection.commit()
+        with BaseConnectManager("base.db") as database:
+            database.cursor.execute(f"UPDATE books2 SET {row_name}= '{
+                value_row}' WHERE id={id_num}")
     except sqlite3.OperationalError as error:
         print(f"You put in wrong place {error}")
 
@@ -131,5 +131,6 @@ def update_column_row(row_name: str, value_row, id_num: int):
 if __name__ == "__main__":
     cursor = create_connection()
     authors = get_title_authors(cursor)
-
     emails_browed = get_emails_and_id(cursor)
+
+    print(get_all_books_from_db())
