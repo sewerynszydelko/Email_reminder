@@ -5,23 +5,22 @@ import sqlite3
 class BaseConnectManager:
     """ Contex menager for data base"""
 
-    def __init__(self, data_base):
-        self.data_base = data_base
+    def __init__(self, connection):
+        self.connection = connection
         self.cursor = None
-        self.connection = None
-        pass
 
     def __enter__(self):
         print("conecting")
-        with sqlite3.connect(self.data_base) as connection:
-            cursor = connection.cursor()
-        self.connection = connection
-        self.cursor = cursor
-        return self.cursor
+        self.cursor = self.connection.cursor()
+        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cursor.close()
-        print("closing")
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        if isinstance(exc_value, Exception):
+            self.connection.rollback()
+        else:
+            self.connection.commit()
+        
+        self.connection.close()
 
 
 def get_all_books_from_db(base_name: str) -> list:
@@ -31,7 +30,8 @@ def get_all_books_from_db(base_name: str) -> list:
     Returns:
         list: returns all books info in dictonary
     """
-    with BaseConnectManager(base_name) as cursor:
+    connection = sqlite3.connect("base.db")
+    with BaseConnectManager(connection) as cursor:
         cursor.execute("SELECT * FROM books2")
         data = []
 
@@ -121,7 +121,8 @@ def update_column_row(row_name: str, value_row, id_num: int):
     """
     try:
         with BaseConnectManager("base.db") as cursor:
-            cursor.execute(f"UPDATE books2 SET {row_name}= '{value_row}' WHERE id={id_num}")
+            cursor.execute(f"UPDATE books2 SET {row_name}= '{
+                           value_row}' WHERE id={id_num}")
             cursor.connection.commit()
     except sqlite3.OperationalError as error:
         print(f"You put in wrong place {error}")
