@@ -72,16 +72,16 @@ def mian_run():
                 show_all_boks()
                 choice_book = User.get_input_choice_type(
                     "Pleas write choicen book title by row number from 0 to 7:").split(" ")
-                
-                with my_db.BaseConnectManager("base.db") as cursor:
-                    title_author = my_db.get_title_authors(cursor)
+
+                with my_db.BaseConnectManager("base.db") as database:
+                    title_author = my_db.get_title_authors(database.cursor)
                     print(title_author[int(choice_book)][title])
 
             case "3":
                 email_adres, title, author, created_at = User.get_input_choice_type(
                     "Pleas enter: email, title, autohr,data\n:").split(",")
                 my_db.add_new_book(email_adres, title,
-                                   author, created_at, "base.db")
+                                   author, created_at)
                 show_all_boks()
             case "5":
                 name = input("Pleas give me name to remaind: ")
