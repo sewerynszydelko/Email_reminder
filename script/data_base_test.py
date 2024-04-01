@@ -8,13 +8,15 @@ def test_get_title_authors():
     # Given
     conection = sqlite3.Connection(':memory:')
     cursor = conection.cursor()
-    cursor.execute('''CREATE TABLE books
-                    (id integer, title text, author text, created_at datae)''')
+    cursor.execute('''CREATE TABLE books2
+                    (id integer, email TEXT,title TEXT, author TEXT, created_at date)''')
     sample_data = [
-        (1, 'Pan Samochodzik', 'Zbigniew Niemacki', '2019-02-03 20:12:22'),
-        (1, 'W pustyni i w puszczy', 'Henryk Sienkiewicz', '2018-06-23 12:20:50')
+        (1, 'jerzy@gmail.com', 'Pan Samochodzik',
+         'Zbigniew Niemacki', '2019-02-03 20:12:22'),
+        (1, 'arek@wp.pl', 'W pustyni i w puszczy',
+         'Henryk Sienkiewicz', '2018-06-23 12:20:50')
     ]
-    cursor.executemany('INSERT INTO books VALUES(?, ?, ?, ?)', sample_data)
+    cursor.executemany('INSERT INTO books2 VALUES(?, ?, ?, ?, ?)', sample_data)
 
     # When
     data = get_title_authors(cursor)
@@ -38,7 +40,7 @@ def test_get_all_books_from_db():
     ]
     cursor.executemany('INSERT INTO books2 VALUES(?, ?, ?, ?, ?)', sample_data)
     # When
-    data = get_all_books_from_db("base.db")
+    data = get_all_books_from_db()
 
     # Then
     print(data)

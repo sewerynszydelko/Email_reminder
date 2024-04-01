@@ -120,8 +120,9 @@ def update_column_row(row_name: str, value_row, id_num: int):
         value_row (_type_): new value to row int or str
         id_num (int): id of row
     """
+    connection = sqlite3.connect("base.db")
     try:
-        with BaseConnectManager("base.db") as database:
+        with BaseConnectManager(connection) as database:
             database.cursor.execute(f"UPDATE books2 SET {row_name}= '{
                 value_row}' WHERE id={id_num}")
     except sqlite3.OperationalError as error:

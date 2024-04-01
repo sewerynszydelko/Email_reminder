@@ -26,4 +26,56 @@ def send_mail(message: str):
         print("meesage sended")
 
 
-send_mail("hello 1 test")
+def send_email2():
+
+    ssl_enable = False
+    port = 587
+    smtp_server = "sandbox.smtp.mailtrap.io"
+    username = "a##"
+    password = "4##"
+
+    subject = "Give back book!"
+    sender = "Serwe <@gmail.com>"
+    receiver = "Test WP <l@wp.pl>"
+
+    message = f"""\
+    Subject: {subject}
+    To: {receiver}
+    From: {sender}
+
+    This is a test e-mail message."""
+
+    if not ssl_enable:
+        connection = smtplib.SMTP(smtp_server, port)
+    else:
+        context = ssl.create_default_context()
+        connection = smtplib.SMTP_SSL(smtp_server, port, context)
+
+    connection.login(username, password)
+    connection.sendmail(sender, receiver, message)
+    print("closing")
+    connection.close()
+
+    """
+    with smtplib.SMTP(smtp_server, 2525) as server:
+        server.login(username, password)
+        server.sendmail(sender, receiver, message)
+    """
+
+
+if __name__ == "__main__":
+    # send_email2()
+
+    sender = "Private Person <@gmail.com>"
+    receiver = "A Test User <@wp.pl>"
+
+    message = f"""\
+    Subject: Hi Mailtrap
+    To: {receiver}
+    From: {sender}
+
+    This is a test e-mail message."""
+
+    with smtplib.SMTP("sandbox.smtp.mailtrap.io", 2525) as server:
+        server.login("", "")
+        server.sendmail(sender, receiver, message)

@@ -73,7 +73,8 @@ def mian_run():
                 choice_book = User.get_input_choice_type(
                     "Pleas write choicen book title by row number from 0 to 7:").split(" ")
 
-                with my_db.BaseConnectManager("base.db") as database:
+                connection = my_db.sqlite3.connect("base.db")
+                with my_db.BaseConnectManager(connection) as database:
                     title_author = my_db.get_title_authors(database.cursor)
                     print(title_author[int(choice_book)][title])
 
