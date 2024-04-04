@@ -1,101 +1,64 @@
 """ Main file """
-from os import environ, getenv
+import email
+import sqlite3
+from collections import namedtuple
+from string import Template
+from os import getenv
 from dotenv import load_dotenv
-import data_base as my_db
-import email_send as es
-import smtplib
+from borrowers import get_borwers_by_return_date
+from email_send import EmailSender
+
+load_dotenv()
+connection_sq = sqlite3.connect(getenv("DB_NAME"))
+
+ssl_enable = getenv("SSL_ENABLE")
+port = getenv("PORT")
+smtp_server = getenv("SMTP_SERVER")
+username = getenv("USERNAME_EMAIL")
+password = getenv("PASSWORD")
+
+sender = getenv("SENDER")
+subject = getenv("SUBJECT")
 
 
-class User:
-    """ User class """
-
-    def __init__(self, name: str) -> None:
-        self.name = name
-
-    def __str__(self) -> str:
-        return f"User:{self.name}"
-
-    @staticmethod
-    def get_input_choice_type(message: str, chosen_type=str):
-        """Get input from user in specific type (int or str) with your message
-        Args:
-            message (str): Your message to user
-            chosen_type (_type_, optional): You can chose to waht type o convert input. Defaults to str.
-        Returns:
-            str or int: returns user input in specific type
-        """
-        user_input = input(message)
-        try:
-            if chosen_type is int:
-                return int(user_input)
-
-            if chosen_type is str:
-                return user_input
-            else:
-                return user_input
-
-        except ValueError as error:
-            print("You chose wrong type: ", error)
-            return False
+Credentials = namedtuple("Credentials", "username password")
+credentials = Credentials(username, password)
 
 
-def show_all_boks():
-    """ Shows all titles with thier autros from data base """
-    with my_db.BaseConnectManager("base.db") as curosr:
-        data = my_db.get_title_authors(curosr)
+def send_reminder_to_borrower(borower):
 
-    for book in data:
-        print(book)
+    template = Template('''Hey $name!
+Remember, you have my book: $title !
+Pleas give it back to me as quick as posible
+Return date: $returned_at
 
+I'm Waiting
+    ''')
+    text_msg = template.substitute({
+        'name': borower.name,
+        'title': borower.title,
+        'returned_at': borower.returned_at
+    })
 
-def create_message_to_remaind(data, name):
-    """ Create message that reminds about book to return """
-    final_message = f"Hello {name}\nIm writing to you to remind about book that you borowed:\n{
-        data[0]["title"]}-{data[0]["author"]}\nPleas return to libry by end of month\nBest Regards!"
+    message = email.message_from_string(text_msg)
 
-    return final_message
+    message.set_charset("utf-8")
+    message["From"] = sender
+    message["To"] = borower.email_adres
+    message["Subject"] = subject
 
-
-def mian_run():
-    print("Hello welcom in menu of book base choce what you  want below\n")
-    while True:
-        user_input = User.get_input_choice_type(
-            "What you want to do ?: \n1: See all books in base\n2:choice book\n3:Give new book to data base\n4:Exit of program\n5:send remaind message to people\n")
-
-        match user_input:
-            case "4":
-                break
-            case "1":
-                show_all_boks()
-                input("type anything to continoue ")
-            case "2":
-                show_all_boks()
-                choice_book = User.get_input_choice_type(
-                    "Pleas write choicen book title by row number from 0 to 7:").split(" ")
-
-                connection = my_db.sqlite3.connect("base.db")
-                with my_db.BaseConnectManager(connection) as database:
-                    title_author = my_db.get_title_authors(database.cursor)
-                    print(title_author[int(choice_book)][title])
-
-            case "3":
-                email_adres, title, author, created_at = User.get_input_choice_type(
-                    "Pleas enter: email, title, autohr,data\n:").split(",")
-                my_db.add_new_book(email_adres, title,
-                                   author, created_at)
-                show_all_boks()
-            case "5":
-                name = input("Pleas give me name to remaind: ")
-                cursor = my_db.create_connection()
-                data = my_db.get_title_authors(cursor)
-                message = create_message_to_remaind(data=data, name=name)
-
-                try:
-                    es.send_mail(message)
-                except smtplib.SMTPAuthenticationError as error:
-                    print("Error:", error)
+    connection.sendmail(sender, borower.email_adres, message)
+    print(f"Sending to: {borower.email_adres}")
 
 
 if __name__ == "__main__":
-    print(create_message_to_remaind(
-        [{"title": "ambroży", "author": "Henryk"}], "Bob"))
+
+    borrowers = get_borwers_by_return_date(connection_sq, "2024-05-24")
+
+    with EmailSender(port, smtp_server, credentials) as connection:
+        for borower in borrowers:
+            send_reminder_to_borrower(borower)
+
+
+# from datetime import datetime
+# datetime.today().strftime('%Y-%m-%d')
