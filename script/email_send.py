@@ -12,7 +12,7 @@ class EmailSender:
 
     def __enter__(self):
         if not self.ssl_enable:
-            self.connection = smtplib.SMTP(smtp_server, port)
+            self.connection = smtplib.SMTP(self.smtp_server, self.port)
         else:
             context = ssl.create_default_context()
             self.connection = smtplib.SMTP_SSL(
