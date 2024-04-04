@@ -21,9 +21,3 @@ def get_borwers_by_return_date(connection, date_returned_at):
                             borrowed_at, returned_at))
 
     return entities
-
-
-# from datetime import datetime
-# datetime.today().strftime('%Y-%m-%d')
-borowers = get_borwers_by_return_date(connection, "2024-05-25")
-print(borowers)
